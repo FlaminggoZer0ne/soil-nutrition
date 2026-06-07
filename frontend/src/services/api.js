@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// In production, VITE_API_URL points to the Render backend URL
+// In production, VITE_API_URL points to the backend URL
 // In development, empty string lets Vite proxy handle /api -> localhost:5000
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '',
