@@ -15,7 +15,7 @@ import PGBlocksManagementPage from './pages/admin/PGBlocksManagementPage';
 import { Menu, X } from 'lucide-react';
 
 const MainAppContent = () => {
-  const { user, loading, isAdmin, isViewer } = useAuth();
+  const { user, loading, isAdmin, isViewer, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState('landing');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -83,38 +83,43 @@ const MainAppContent = () => {
 
   return (
     <div className="app-container">
-      {/* Mobile Toggle Button */}
-      <button 
-        style={{
-          position: 'fixed',
-          top: '20px',
-          right: '20px',
-          zIndex: 999,
-          background: 'var(--bg-secondary)',
-          border: '1px solid var(--glass-border)',
-          borderRadius: '8px',
-          color: '#ffffff',
-          padding: '8px',
-          cursor: 'pointer',
-          display: 'none' // Controlled in CSS or responsive media
-        }}
-        className="mobile-sidebar-toggle"
-        onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-      >
-        {mobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-      </button>
+      {/* Mobile Top Bar - visible only on mobile */}
+      <div className="mobile-topbar">
+        <button
+          className="mobile-menu-btn"
+          onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+          aria-label="Buka menu"
+        >
+          {mobileSidebarOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+
+        <div className="mobile-topbar-brand">
+          <span>🌱</span>
+          <span>SOIL LAB</span>
+        </div>
+
+        <button
+          className="mobile-logout-btn"
+          onClick={() => { if (window.confirm('Keluar dari aplikasi?')) logout(); }}
+          aria-label="Logout"
+          title="Logout"
+        >
+          <X size={18} />
+          <span>Keluar</span>
+        </button>
+      </div>
 
       {/* Mobile Sidebar Backdrop Overlay */}
       {mobileSidebarOpen && (
-        <div 
-          className="mobile-sidebar-overlay" 
+        <div
+          className="mobile-sidebar-overlay"
           onClick={() => setMobileSidebarOpen(false)}
         />
       )}
 
       {/* Navigation Sidebar */}
-      <Sidebar 
-        currentPage={currentPage} 
+      <Sidebar
+        currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         mobileOpen={mobileSidebarOpen}
         setMobileOpen={setMobileSidebarOpen}
@@ -124,15 +129,6 @@ const MainAppContent = () => {
       <main className="main-content">
         {renderPageContent()}
       </main>
-
-      {/* Inject custom mobile toggle layout css rule dynamically */}
-      <style>{`
-        @media (max-width: 768px) {
-          .mobile-sidebar-toggle {
-            display: block !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };
