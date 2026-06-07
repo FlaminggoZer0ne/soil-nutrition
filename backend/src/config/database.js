@@ -1,19 +1,27 @@
 const { Sequelize } = require('sequelize');
 
-// Use DATABASE_URL for production (Neon PostgreSQL)
-// For local development, set DATABASE_URL in backend/.env
 if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL environment variable is required. Please set it in backend/.env');
+  throw new Error('DATABASE_URL environment variable is required.');
 }
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
+// Parse sslmode from URL if present, handle Neon's require sslmode
+const dbUrl = process.env.DATABASE_URL;
+
+const sequelize = new Sequelize(dbUrl, {
   dialect: 'postgres',
   dialectOptions: {
-    ssl: process.env.NODE_ENV === 'production'
-      ? { require: true, rejectUnauthorized: false }
-      : false
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    }
   },
-  logging: false
+  logging: false,
+  pool: {
+    max: 2,        // Vercel serverless: keep pool small
+    min: 0,
+    acquire: 10000,
+    idle: 10000
+  }
 });
 
 module.exports = sequelize;
