@@ -48,8 +48,20 @@ function isAdmin(req, res, next) {
   }
 }
 
+/**
+ * Middleware to restrict access to admin or viewer only.
+ */
+function isAdminOrViewer(req, res, next) {
+  if (req.user && (req.user.role === 'admin' || req.user.role === 'viewer')) {
+    next();
+  } else {
+    return res.status(403).json({ message: 'Akses ditolak.' });
+  }
+}
+
 module.exports = {
   verifyToken,
   isAdmin,
+  isAdminOrViewer,
   JWT_SECRET
 };

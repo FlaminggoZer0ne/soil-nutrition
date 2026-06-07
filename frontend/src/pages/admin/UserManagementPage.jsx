@@ -10,7 +10,8 @@ import {
   UserX,
   AlertCircle,
   CheckCircle2,
-  Settings
+  Settings,
+  Trash2
 } from 'lucide-react';
 
 const UserManagementPage = () => {
@@ -147,6 +148,19 @@ const UserManagementPage = () => {
     }
   };
 
+  // Handle Delete user
+  const handleDelete = async (id, nama) => {
+    if (confirm(`Hapus pengguna "${nama}" secara permanen? Tindakan ini tidak dapat dibatalkan.`)) {
+      try {
+        await api.delete(`/api/users/${id}`);
+        fetchUsers();
+        alert('Pengguna berhasil dihapus.');
+      } catch (err) {
+        alert(err.response?.data?.message || 'Gagal menghapus pengguna.');
+      }
+    }
+  };
+
   // PG checkboxes helper
   const handlePGAksesChange = (pgName, isAdd = true) => {
     if (isAdd) {
@@ -215,8 +229,8 @@ const UserManagementPage = () => {
                     </td>
                     <td>{u.index_pegawai}</td>
                     <td>
-                      <span className={`badge ${u.role === 'admin' ? 'badge-role-admin' : 'badge-role-user'}`}>
-                        {u.role}
+                      <span className={`badge ${u.role === 'admin' ? 'badge-role-admin' : u.role === 'viewer' ? 'badge-role-viewer' : 'badge-role-user'}`}>
+                        {u.role === 'admin' ? 'Admin' : u.role === 'viewer' ? 'Viewer' : 'User'}
                       </span>
                     </td>
                     <td>
@@ -264,6 +278,14 @@ const UserManagementPage = () => {
                       <div className="actions-cell">
                         <button className="icon-btn edit" onClick={() => handleEditClick(u)} title="Edit User">
                           <Edit size={15} />
+                        </button>
+                        <button 
+                          className="icon-btn delete" 
+                          onClick={() => handleDelete(u.id, u.nama)} 
+                          title="Hapus User"
+                          style={{ color: '#fb7185' }}
+                        >
+                          <Trash2 size={15} />
                         </button>
                       </div>
                     </td>
@@ -329,6 +351,7 @@ const UserManagementPage = () => {
               onChange={(e) => setAddForm({ ...addForm, role: e.target.value })}
             >
               <option value="user">User (Petugas Lapangan)</option>
+              <option value="viewer">Viewer (Lihat & Export)</option>
               <option value="admin">Admin (Akses Penuh)</option>
             </select>
           </div>
@@ -413,6 +436,7 @@ const UserManagementPage = () => {
                 onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
               >
                 <option value="user">User (Petugas Lapangan)</option>
+                <option value="viewer">Viewer (Lihat & Export)</option>
                 <option value="admin">Admin (Akses Penuh)</option>
               </select>
             </div>

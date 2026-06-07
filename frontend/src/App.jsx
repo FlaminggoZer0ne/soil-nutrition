@@ -15,7 +15,7 @@ import PGBlocksManagementPage from './pages/admin/PGBlocksManagementPage';
 import { Menu, X } from 'lucide-react';
 
 const MainAppContent = () => {
-  const { user, loading, isAdmin } = useAuth();
+  const { user, loading, isAdmin, isViewer } = useAuth();
   const [currentPage, setCurrentPage] = useState('landing');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -63,21 +63,21 @@ const MainAppContent = () => {
   const renderPageContent = () => {
     switch (currentPage) {
       case 'dashboard':
-        return isAdmin ? <AdminDashboard /> : <UserDashboard onNavigate={setCurrentPage} />;
+        return (isAdmin || isViewer) ? <AdminDashboard /> : <UserDashboard onNavigate={setCurrentPage} />;
       case 'input-ph':
-        return <InputPHPage />;
+        return isViewer ? <UserDashboard onNavigate={setCurrentPage} /> : <InputPHPage />;
       case 'history':
-        return <HistoryPage />;
+        return isViewer ? <UserDashboard onNavigate={setCurrentPage} /> : <HistoryPage />;
       case 'download':
         return <DownloadPage />;
       case 'users':
-        return isAdmin ? <UserManagementPage /> : <UserDashboard onNavigate={setCurrentPage} />;
+        return isAdmin ? <UserManagementPage /> : (isViewer ? <AdminDashboard /> : <UserDashboard onNavigate={setCurrentPage} />);
       case 'logs':
-        return isAdmin ? <LogsPage /> : <UserDashboard onNavigate={setCurrentPage} />;
+        return isAdmin ? <LogsPage /> : (isViewer ? <AdminDashboard /> : <UserDashboard onNavigate={setCurrentPage} />);
       case 'pg-blocks':
-        return isAdmin ? <PGBlocksManagementPage /> : <UserDashboard onNavigate={setCurrentPage} />;
+        return isAdmin ? <PGBlocksManagementPage /> : (isViewer ? <AdminDashboard /> : <UserDashboard onNavigate={setCurrentPage} />);
       default:
-        return isAdmin ? <AdminDashboard /> : <UserDashboard onNavigate={setCurrentPage} />;
+        return (isAdmin || isViewer) ? <AdminDashboard /> : <UserDashboard onNavigate={setCurrentPage} />;
     }
   };
 
