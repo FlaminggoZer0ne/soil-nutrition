@@ -8,5 +8,6 @@ router.get('/', verifyToken, isAdmin, userController.getAll);
 router.post('/', verifyToken, isAdmin, userController.create);
 router.put('/:id', verifyToken, isAdmin, userController.update);
 router.put('/:id/toggle', verifyToken, isAdmin, userController.toggleStatus);
+router.delete('/:id', verifyToken, isAdmin, userController.remove);
 
 module.exports = router;

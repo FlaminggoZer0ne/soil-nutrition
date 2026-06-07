@@ -172,9 +172,45 @@ async function toggleStatus(req, res) {
   }
 }
 
+/**
+ * Delete a user (Admin Only)
+ */
+async function remove(req, res) {
+  const { id } = req.params;
+  const adminUser = req.user;
+
+  try {
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ message: 'Pengguna tidak ditemukan.' });
+    }
+
+    if (user.id === adminUser.id) {
+      return res.status(400).json({ message: 'Anda tidak dapat menghapus akun Anda sendiri.' });
+    }
+
+    const userData = { nama: user.nama, index_pegawai: user.index_pegawai };
+    await user.destroy();
+
+    await ActivityLog.create({
+      user_id: adminUser.id,
+      aksi: 'delete',
+      tabel_target: 'users',
+      data_id: parseInt(id),
+      detail: userData
+    });
+
+    return res.json({ message: 'Pengguna berhasil dihapus.' });
+  } catch (error) {
+    console.error('Delete User Error:', error);
+    return res.status(500).json({ message: 'Gagal menghapus pengguna.' });
+  }
+}
+
 module.exports = {
   getAll,
   create,
   update,
-  toggleStatus
+  toggleStatus,
+  remove
 };
